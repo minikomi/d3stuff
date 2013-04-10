@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <style>
+    body {
+      padding-right: 30px;
+    }
+    #main {
+      position: relative;
+
+    }
+
+    .percent line{
+      stroke-width: 0.5;
+      stroke: #111;
+      stroke-dasharray: 1 5;
+    }
+    
+    .percent text{
+      font-family: sans-serif;
+      font-size: 10px;
+      fill: #444;
+      text-anchor: end;
+    }
+
+    .info text{
+      font-family: sans-serif;
+      font-size: 12px;
+      fill: #444;
+    }
+
+    .info text.title{
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .info text.name{
+      font-weight: bold;
+      font-size: 24px;
+      text-anchor: middle;
+    }
+    .info .hr {
+      fill: #aaa;
+    }
+
+    path.idol{
+      stroke-width: 1px;
+      stroke: #aaa;
+    }
+
+    rect{
+      opacity: 0.75;
+    }
+ 
+    text.idol{
+      font-family: sans-serif;
+      font-size: 10px;
+      fill: #444;
+    }
+
+    text.idol, path.idol{
+      opacity: 0;
+      -webkit-transition: opacity 0.l;
+    }
+    .idol.visible{
+      opacity: 1.0;
+    }
+ 
+    .deadvotes {
+      fill: #ccc;
+    }
+    .team-A, text.team-A {
+     background-color: #FA3EB8;
+     fill: #FA3EB8;
+    }
+    .team-K, text.team-K {
+     background-color: #77B800;
+     fill: #77B800;
+    }
+    .team-B, text.team-B {
+     background-color: #34B6E4;
+     fill: #34B6E4;
+    }
+    .team-4, text.team-4 {
+      background-color: Yellow; 
+      fill: Yellow; 
+    }
+    .team-E, text.team-E { 
+      background-color: #44aa22; 
+      fill: #44aa22; 
+    }
+    .team-H, text.team-H { 
+      background-color: #009140;
+      fill: #009140;
+    }
+    .team-KII, text.team-KII { 
+      background-color: Teal;
+      fill: Teal;
+    }
+    .team-N, text.team-N { 
+      background-color: #333333;
+      color: #333333;
+    }
+    .team-S, text.team-S {
+      background-color: Orange;
+      fill: Orange;
+    }
+    .team-SK, text.team-SK { 
+      background-color: #aea9a2;
+      fill: #aea9a2;
+    }
+    .team-kenkyuuse, text.team-kenkyuusei{ 
+     background-color: Red; 
+     fill: Red; 
+    }
+    .singleinfo {
+      text-anchor: middle;
+      font-size: 10px;
+      font-family: sans-serif;
+    }
+    #explanation {
+      font-size: 12px;
+      width: 260px;
+      font-family: sans-serif;
+      position: absolute;
+      left: 723px;
+      top: 20px;
+      opacity: 1;
+      text-align: justify;
+      -webkit-transition: opacity 0.1s;
+    }
+    #explanation.hidden{
+      opacity: 0;
+    }
+    .legend {
+      float:left;
+      padding: 0;
+      list-style: none;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 5px;
+    }
+    .legend li {
+      float: left;
+      width: 50%;
+
+    }
+    .legend li div {
+      margin-top: 3px;
+      height: 0.6em;
+      width: 30px;
+      margin-right: 5px;
+      float: left;
+      margin-right; 30px;
+    }
+    h2 {
+       clear: both;
+       margin-top: 5px;
+       margin-bottom: 0;
+    }
+    .small{
+      font-size: 0.9em;
+    }
+
+    a {
+      text-decoration: none;
+      color: #3ad;
+    }
+
+    a:hover {
+      text-decoration: none;
+      color: #f7a;
+    }
+
+    #explanation ul {
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      position: relative;
+      width: 1000px;
+      margin: 10px auto;
+    }
+    </style>
+
+    </head>
+
+<body>
+<h1>AKB48選抜総選挙歴史</h1>
+<div id="main">
+<script src="d3.v3.min.js"></script>
+<script>
+
+var singlesinfo = [
+  {title: "13thシングル選抜総選挙",subtitle: "「神様に誓ってガチです」"}
+  , {title: "17thシングル選抜総選挙",subtitle: "「母さんに誓って、ガチです」"}
+  , {title:"22ndシングル選抜総選挙", subtitle: "「今年もガチです」"}
+  , {title:"27thシングル選抜総選挙", subtitle: "〜ファンが選ぶ64議席〜"}
+  ];
+
+var images = {
+  "秋元才加":"akimoto_list.jpg",
+  "藤江れいな":"fujie_itiran.jpg",
+  "市川美織":"ichikawa_miori_list.jpg",
+  "石田晴香":"ishida_haruka_list.jpg",
+  "板野友美":"itano_itiran.jpg",
+  "岩佐美咲":"iwasa_misaki_list.jpg",
+  "松井珠理奈":"jyurinamatui_itiran.jpg",
+  "河西智美":"kasai_tomomi_list.jpg",
+  "柏木由紀":"kashiwagi_yuki_list.jpg",
+  "片山陽加":"katayama_haruka_list.jpg",
+  "菊地あやか":"kikuchi_itiran.jpg",
+  "北原里英":"kitahara_rie_list.jpg",
+  "小林香菜":"kobayashi_kana_list.jpg",
+  "小嶋陽菜":"kojima_haruna_list.jpg",
+  "小森美果":"komori_mika_list.jpg",
+  "倉持明日香":"kuramochi_asuka_list.jpg",
+  "前田亜美":"maeda_ami_list.jpg",
+  "松井咲子":"matsui_itiran.jpg",
+  "宮崎美穂":"miyazaki_itiran.jpg",
+  "宮澤佐江":"miyazawa_itiran.jpg",
+  "渡辺美優紀":"miyukiwatanabe_itiran.jpg",
+  "武藤十夢":"mutoutomu_itiran.jpg",
+  "福本愛菜":"fukumoto_aina.jpg",
+  "古川愛李":"furukawa_airi.jpg",
+  "秦佐和子":"hata_sawako.jpg",
+  "山田菜々":"juna_yamada.jpg",
+  "木本花音":"kimoto_kanon.jpg",
+  "木﨑ゆりあ":"kizaki_yuria.jpg",
+  "松井玲奈":"matsui_rena.jpg",
+  "松村香織":"matsumura_kaori.jpg",
+  "永尾まりや":"nagao_mariya_list.jpg",
+  "仲川遥香":"nakagawa_haruka_list.jpg",
+  "仁藤萌乃":"nito_itiran.jpg",
+  "大場美奈":"oba_mina_list.jpg",
+  "小笠原茉由":"ogasawara_mayu.jpg",
+  "小木曽汐莉":"ogiso_shiori.jpg",
+  "大島優子":"oshma_itiran.jpg",
+  "大家志津香":"oya_shizuka_list.jpg",
+  "佐藤亜美菜":"sato_amina_list.jpg",
+  "佐藤すみれ":"sato_sumire_list.jpg",
+  "島崎遥香":"shimazaki_haruka_list.jpg",
+  "篠田麻里子":"shinoda_mariko_list.jpg",
+  "高橋みなみ":"takahashi_minami_list.jpg",
+  "高柳明音":"takayanagi_akane.jpg",
+  "田野優花":"tano_yuuka_list.jpg",
+  "梅田彩佳":"umeda_iiran.jpg",
+  "渡辺麻友":"watanbe_itiran.jpg",
+  "矢神久美":"yagami_kumi.jpg",
+  "矢方美紀":"yakata_miki.jpg",
+  "山内鈴蘭":"yamauchi_suzuran_list.jpg",
+  "横山由依":"yokoyama_itiran.jpg",
+  "須田亜香里":"suda_akari.jpg",
+  "向田茉夏":"mukaida_manatsu.jpg",
+  "増田有華":"masuda_yuka.jpg",
+  "平嶋夏海":"hirajima_natsumi.jpg",
+  "浦野一美":"kazumi_urano.jpg",
+  "松原夏海":"matsubara_natsumi.jpg",
+  "小野恵令奈":"erena_ono.jpg",
+  "峯岸みなみ":"minegishi_minami.jpg",
+  "中西優香": "nakanishi_yuka.jpg",
+  "宮脇咲良":"miyawaki_sakura.jpg",
+  "仲谷明香":"nakaya_sayaka.jpg",
+  "大堀恵":"ohori_megumi.jpg",
+  "大矢真那":"oya_masana.jpg",
+  "米沢瑠美":"yonezawa_rumi.jpg",
+  "指原莉乃":"rino_sashihara.jpg",
+  "佐藤由加理":"sato_yukari.jpg",
+  "多田愛佳":"aika_ota.jpg",
+  "石黒貴己":"ishiguro_atsuki.jpg",
+  "高城亜樹":"takajo_aki_list.jpg",
+  "前田敦子":"maeda_atsuko.jpg",
+  "山本彩":"sakaya_yamamoto.jpg",
+  "中田ちさと": "nakata_chisato_list.jpg"
+}
+
+
+var margin = {top: 20, right: 20, bottom: 80, left: 40},
+    width = 1000 - margin.left - margin.right,
+    height = 660 - margin.top - margin.bottom;
+
+var translate = function(x,y){               
+  return "translate(" + x + "," + y + ")";
+}
+
+
+var svg = d3.select("#main").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", translate(margin.left, margin.top + 0.5))
+
+d3.values(images)
+  .forEach(function(i){ 
+    svg.append("image")
+      .attr("height",0)
+      .attr("w",0)
+      .attr("xlink:href","image/"+i)});
+
+d3.csv("akb.csv", function(csvData){
+
+   var singlesdata = d3.nest()
+    .key(function(d){return d.Single})
+    .key(function(d){return d.Rank})
+    .rollup(function(d){ return {name: d[0].Name, votes: +d[0].Votes, team: d[0].Team, single: +d[0].Single, rank: d[0].Rank}; })
+    .entries(csvData);
+
+  var chartwidth = (width*0.65);
+  var infowidth = width - chartwidth;
+  var barwidth = 30;
+  var infobarwidth = 260;
+  var spacing = (chartwidth - (barwidth * (singlesdata.length - 3)))/(singlesdata.length-1);
+
+  var sumVotes = function(single) {
+    return single.values.reduce(function(sum, d){return d.values.votes + sum}, 0)
+  }
+
+  var y = d3.scale.linear()
+          .range([0, height])
+          .domain([0,100]);
+
+  var x = d3.scale.linear()
+          .range([0,infobarwidth])
+          .domain([0,100]);
+
+  var percents = svg.selectAll(".percent")
+      .data(d3.range(0,101,10))
+    .enter().append("g")
+      .attr("class","percent")
+      .attr("transform", function(d){return translate(0, y(d)-0.5)})
+
+  percents.append("line")
+    .attr("y1", 0)
+    .attr("y2", 0)
+    .attr("x1", 0)
+    .attr("x2", chartwidth + 40);
+
+  percents.append("text")
+      .attr("y", 12)
+      .attr("x", chartwidth + 40)
+      .text(function(d){return d + "%"});
+
+  singlesdata.map(function(d){
+    var dx = 0;
+    d.values.map(function(datum){
+      datum.values.dx = dx; 
+      dx += datum.values.votes; 
+      return d
+    })
+  });
+
+  var totals = singlesdata.map(function(d){ return sumVotes(d) })
+
+  var singles = svg.selectAll(".single")
+        .data(singlesdata,function(d,i) { return d.key; })
+      .enter().append("g")
+        .attr("class", "single")
+        .attr("transform", function(d,i) { return translate( (i*spacing), 0)});
+
+  singles.selectAll(".singleinfo")
+    .data(function(d){return d.key})
+      .enter()
+        .append("text")
+          .text(function(d){return singlesinfo[d-1].title})
+          .attr("class", "singleinfo")
+          .attr("dy", -10)
+          .attr("x", barwidth / 2)
+
+
+  var idols = singles.selectAll(".idol")
+      .data(function(d){ return d.values })
+
+  idols.enter().append("rect")
+      .attr("height", function(d,i){ return y((d.values.votes/totals[d.values.single-1]) * 100) - 1})
+      .attr("width", barwidth)
+      .attr("x", 0)
+      .attr("y", function(d) { return y((d.values.dx /totals[d.values.single-1]) * 100) + 1})
+      .attr("class", function(d){ return "idol team-"+d.values.team})
+      .attr("data-idol", function(d) {return d.values.name})
+      .on("mouseover", function(d){
+        d3.select("#explanation")
+          .classed("hidden", true)
+
+        var history = d3.selectAll(".idol")
+          .filter(function(el){
+            return el.values.name == d.values.name
+          })
+          .classed("visible",true);
+
+        var infobox = svg.append("g")
+          .attr("class", "info")
+          .attr("transform", translate(chartwidth+60, 0));
+
+        infobox.append("text")
+          .attr("class", "name")
+          .attr("x", infobarwidth / 2)
+          .attr("y", 26)
+          .text(d.values.name)
+
+        infobox.append("rect")
+          .attr("height", 1)
+          .attr("class", "hr")
+          .attr("width", infobarwidth)
+          .attr("y", 0)
+
+        infobox.append("rect")
+          .attr("height", 1)
+          .attr("class", "hr")
+          .attr("width", infobarwidth)
+          .attr("y", 30)
+
+        infobox.append("image")
+               .attr("height", 160)
+               .attr("width", 125)
+               .attr("y", 33)
+               .attr("x", (infobarwidth / 2) - 62.5)
+               .attr("xlink:href", "image/"+images[d.values.name])
+
+        var history = infobox.selectAll(".history")
+          .data(singlesdata.reduce(function(v, sd){
+            var idol = sd.values.filter(function(s){return s.values.name == d.values.name});
+            if (idol.length > 0 ) {
+              v.push(idol[0])
+            }
+            return v;
+          }, []))   
+
+        bars = history.enter()
+               .append("g")
+               .attr("class","bar")
+                  .attr("transform", translate(0,220))
+
+        bars.append("text")
+              .attr("class", "title")
+               .text(function(d){ return singlesinfo[d.values.single - 1].title})
+               .attr("y", function(d,i){return i * 60;})
+
+        bars.append("text")
+              .attr("class", function(d){ return "team-"+d.values.team})
+               .text(function(d){return "Team " + d.values.team})
+               .attr("y", function(d,i){return i * 60;})
+               .attr("x", 163)                   
+
+        bars.append("text")
+               .attr("class", "subtitle")
+               .text(function(d){ return singlesinfo[d.values.single - 1].subtitle})
+               .attr("y", function(d,i){return (i * 60) + 17;})
+
+        bars.append("text")
+               .attr("class", "subtitle")
+               .text(function(d){ return ""+ d.values.votes+" / "+totals[d.values.single-1] })
+               .attr("x", 163)
+               .attr("y", function(d,i){return (i * 60) + 17;})
+
+        bars.append("rect")
+               .text(function(d){return d.values.single})
+               .attr("y", function(d,i){return (i * 60) + 20;})
+               .attr("x", 0)
+               .attr("width", function(d){return x(d.values.votes / totals[d.values.single-1] * 100)})
+               .attr("class", function(d){ return "team-"+d.values.team})
+               .attr("height", 12)
+
+        bars.append("rect")
+               .attr("y", function(d,i){return (i * 60) + 20;})
+               .attr("x", 0)
+               .attr("x", function(d){return 1 + x(d.values.votes / totals[d.values.single-1] * 100)})
+               .attr("width", function(d){return x((totals[d.values.single-1] - d.values.votes) / totals[d.values.single-1] * 100)})
+               .attr("class", function(d){ return "deadvotes"})
+               .attr("height", 12)
+        
+        bars.append("text")
+          .text(function(d){return d.key;})
+          .attr("y", function(d,i){return (i * 60) + 31;})
+          .attr("x", infobarwidth + 2)
+          .attr("style", "fill: #444; font-height: 10px;")
+
+
+      })
+      .on("mouseout", function(d){
+        d3.select("#explanation")
+          .classed("hidden",false)
+
+        d3.selectAll(".idol")
+          .classed("visible", false);
+        d3.selectAll(".info")
+            .remove()
+      });
+
+  idols.enter().append("text")
+      .attr("class", "idol")
+      .attr("x", barwidth + 2)
+      .attr("y", function(d) { return y(((d.values.dx + (d.values.votes/2)) /totals[d.values.single-1]) * 100) + 14})
+      .text( function(d){return d.values.rank})
+
+
+  idols.enter().append("svg:path")
+    .attr("data-idol", function(d) {return d.values.name})
+    .attr("class", "idol")
+    .filter(function(d) {
+      if (singlesdata[d.values.single] === undefined) {
+        return false;
+      }
+      return (singlesdata[d.values.single].values.filter( function(e){ return e.values.name == d.values.name}).length > 0)
+    })
+    .attr("d", function(d){
+      var d1 = singlesdata[d.values.single].values.filter( function(e){ return e.values.name == d.values.name})[0];
+      return "M " + (barwidth + 5)  + " " + y((d.values.dx  + d.values.votes/2)/totals[d.values.single-1] * 100) + 
+             "L " + (spacing - 6)   + " " + y((d1.values.dx + d1.values.votes/2)/totals[d.values.single] * 100)
+    })
+});
+</script>
+<div id="explanation">
+  <p>
+    AKB48のニューシングルに参加するメンバーを選ぶ人気投票のデータを並べた図です。投票資格はシングルCDの購入者やファンクラブ会員などに与えられ、ファンにより選抜メンバーが選出される唯一の機会である。
+  </p>
+  <p>
+    マウスオーバーで、アイドル一人の歴史が見えます。
+  </p>
+  <h2>
+    Legend
+  </h2>
+  <ul class="legend">
+      <li><div class="team-A" ></div> - Team A</li>
+      <li><div class="team-K"></div> - Team K</li>
+      <li><div class="team-B"></div> - Team B</li>
+      <li><div class="team-4"></div> - Team 4</li>
+      <li><div class="team-E"></div> - Team E</li>
+      <li><div class="team-H"></div> - Team H</li>
+      <li><div class="team-KII"></div> - Team KII</li>
+      <li><div class="team-N"></div> - Team N</li>
+      <li><div class="team-S"></div> - Team S</li>
+      <li><div class="team-SK"></div> - Team K</li>
+      <li><div class="team-kenkyuuse"></div> - Kenkyuusei</li>
+  </ul>
+  
+  <h2>データーのソーズ</h2>
+  <ul>
+    <li><a href="http://ja.wikipedia.org/wiki/AKB48_13th%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E9%81%B8%E6%8A%9C%E7%B7%8F%E9%81%B8%E6%8C%99%E3%80%8C%E7%A5%9E%E6%A7%98%E3%81%AB%E8%AA%93%E3%81%A3%E3%81%A6%E3%82%AC%E3%83%81%E3%81%A7%E3%81%99%E3%80%8D">AKB48 13thシングル選抜総選挙</a>
+    <br/>                                                                                                      
+        <span class="small">第1回・2009年・赤坂BLITZ</span></li>
+    <li>
+    <a href="http://ja.wikipedia.org/wiki/AKB48_17th%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E9%81%B8%E6%8A%9C%E7%B7%8F%E9%81%B8%E6%8C%99%E3%80%8C%E6%AF%8D%E3%81%95%E3%82%93%E3%81%AB%E8%AA%93%E3%81%A3%E3%81%A6%E3%80%81%E3%82%AC%E3%83%81%E3%81%A7%E3%81%99%E3%80%8D">AKB48 17thシングル選抜総選挙</a>
+   <br/><span class="small">第2回・2010年・JCBホール</span></li>
+    <li><a href="http://ja.wikipedia.org/wiki/AKB48_22nd%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E9%81%B8%E6%8A%9C%E7%B7%8F%E9%81%B8%E6%8C%99">AKB48 22ndシングル選抜総選挙</a>
+      <br/>第3回・2011年・日本武道館</span></li>
+      <li><a href="http://ja.wikipedia.org/wiki/AKB48_27th%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E9%81%B8%E6%8A%9C%E7%B7%8F%E9%81%B8%E6%8C%99">AKB48 27thシングル選抜総選挙</a>
+      <br/>
+      <span class="small">第4回・2012年・日本武道館</span></li>
+  </ul>
+
+</div>
+</div>
+    
+</body>
+</html>
