@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title></title>
+<style>
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.happening {
+ stroke-width: 1px;
+}
+
+body {
+  font-family: sans-serif;
+  position: relative;
+  width: 1000px;
+  margin: 10px auto;
+}
+.tick {
+ font-size: 10px;
+}
+
+#main {
+  margin: 0 0 0 -40px;
+}
+
+svg{
+  shape-rendering: crispEdges;
+}
+
+.day line, .gridbase{
+  stroke: #555;
+  stroke-width: 1;
+}
+
+.day text {
+  text-anchor: end;
+  font-size: 10px;
+  font-family: sans-serif;
+  fill: #222;
+}
+
+.day text.weekend {
+  fill: #66f;
+}
+
+line.hour {
+  stroke: #ccc;
+}
+line.hour.min {
+  stroke-dasharray: 2 4;
+}
+line.hour.main {
+  stroke: #999;
+}
+
+line.happening{
+  stroke-width: 1px;
+}
+
+.rushhour {
+  fill: #ffeeee;
+}
+
+.datename, .monthname{
+ dominant-baseline: middle;
+}
+.day text.datename{
+  fill: #777;
+}
+.day text.monthname{
+ fill: #f88;
+ text-anchor: start;
+}
+
+</style>
+
+</head>
+
+<body>
+<div id="main">
+  <script src="d3.v3.min.js"></script>
+  <script>
+
+
+  var init = function(data){
+
+  data = data.data.map(function(d){
+      d.Date = new Date(d.Date);
+      return d;
+  });
+
+  var lines = ["hibiya", "ginza", "chiyoda", "touzai", "fukutoshin", "yurakucho", "hanzoumon", "nanboku", "marunouchi"];
+
+  var lineColors = d3.scale.ordinal().domain(lines)
+    .range([
+      d3.rgb(109,109,109),
+      d3.rgb(248,152,29),
+      d3.rgb(0,163,93),
+      d3.rgb(0,178,233),
+      d3.rgb(153,77,43),
+      d3.rgb(248,228,61),
+      d3.rgb(136,37,139),
+      d3.rgb(72, 209, 204),
+      d3.rgb(254,0,0)
+    ]);
+
+
+  var format = d3.time.format("%H:%M:%S")
+
+  var translate = function(x,y){               
+    return "translate(" + x + "," + y + ")";
+  }
+
+  var d3_time_suffixes = ["th", "st", "nd", "rd"];
+
+  var d3_time_suffix = function(number) {
+    return d3_time_suffixes[(number > 10 && number < 14) || number % 10 > 3 ? 0 : number % 10];
+  }
+
+  nested = d3.nest()
+    .key(function(d){return d3.time.day.floor(d.Date)})
+    .key(function(d){return d.LineName}).sortKeys(d3.ascending)
+    .entries(data)
+
+  var extent = d3.extent(data, function(d){return d.Date});
+
+  var dayCount = d3.time.days.apply(this,extent).length;
+
+  var blocksize      = 3;
+      dayHeight      = lines.length * blocksize,
+      width          = 900,
+      topChartHeight = 300,
+      gridHeight     = (dayCount * dayHeight),
+      height         = topChartHeight + 50 + gridHeight,
+      margin         = {top: 20, right: 20, bottom: 40, left: 60};
+
+  var x = d3.time.scale()
+    .rangeRound([0,width])
+    .domain([
+      format.parse("0:0:0"),
+      +format.parse("0:0:0") + (24 * 60 * 60 * 1000)
+    ]);
+
+  var topY = d3.time.scale()
+    .range([0 , topChartHeight]);
+
+  gridY = d3.time.scale()
+    .rangeRound([gridHeight, 0])
+    .domain(d3.extent(data, function(d){return d.Date}))
+    .nice(d3.time.day)
+
+  var svg = d3.select("#main").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", translate(margin.left, margin.top))
+
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(d3.time.format("%I %p"))
+    .tickSubdivide(2)
+    .ticks(d3.time.hours, 3)
+    .tickSize(8,4,2)
+
+  svg.append("g").attr("class", "axis")
+     .attr("transform", translate(0, topChartHeight + 18))
+     .call(xAxis)
+
+  var grid = svg.append("g")
+    .attr("class", "grid")
+    .attr("transform", translate(0, topChartHeight + 50))
+
+  var days = grid.selectAll(".day")
+    .data(gridY.ticks(d3.time.days)).enter()
+      .append("g")
+        .attr("class","day")
+        .attr("transform", function(d){return translate(0, gridY(d))})
+
+  days.append("rect")
+    .filter(function(d){return (d.getDay() != 0 && d.getDay() != 6)})
+      .attr("class", "rushhour")
+      .attr("x", x(format.parse("8:0:0")))
+      .attr("width", x(format.parse("10:0:0")) - x(format.parse("8:0:0")))
+      .attr("height", dayHeight)
+
+  days.append("rect")
+    .filter(function(d){return (d.getDay() != 0 && d.getDay() != 6)})
+      .attr("class", "rushhour")
+      .attr("x", x(format.parse("17:0:0")))
+      .attr("width", x(format.parse("20:0:0")) - x(format.parse("17:0:0")))
+      .attr("height", dayHeight)
+
+  days.append("text")
+    .attr("dx",-2)  
+    .attr("dy", 1 + dayHeight / 2)
+      .attr("class", "datename")
+      .text(function(d){return d.getDate()+d3_time_suffix(d.getDate())})
+
+  days.append("text")
+    .filter(function(d, i){return new Date(+d +(24 * 60 * 60 * 1000)).getDate() == 1 || i == dayCount + 1 })
+      .attr("dx",-45)   
+    .attr("dy", 1 + dayHeight / 2)
+      .attr("class", "monthname")
+      .text(function(d){return d3.time.format("%b")(d)})
+
+
+  grid.selectAll(".hour")
+    .data(x.ticks(24*2)).enter()
+      .append("line")
+        .attr("class", "hour")
+        .classed("main", function(d){return (d.getHours() % 3) == 0 && d.getMinutes() == 0 })
+        .classed("min", function(d){return (d.getMinutes() != 0)})
+        .attr("y1",-10)
+        .attr("y2",gridHeight + dayHeight)
+        .attr("x1", function(d){return x(d)})
+        .attr("x2", function(d){return x(d)})
+
+  days.append("line")
+    .attr("x1",function(d){
+      return d.getDate() == 1 ? -40 : 0;
+    })
+    .attr("x2",width)
+    .attr("y1", dayHeight)
+    .attr("y2", dayHeight)
+
+  grid.append("line")
+    .attr("class", "gridbase")
+    .attr("x1", -45)
+    .attr("x2", width)
+
+  var happeningDays = grid.selectAll(".happening-day")
+    .data(nested).enter()
+      .append("g")
+        .attr("class","happening-day")
+        .attr("transform", function(d){return translate(0, gridY(new Date(d.key)))})
+
+  var lineGroups = happeningDays.selectAll(".linegroup")
+    .data(function(d) {return d.values}).enter()
+      .append("g")
+        .attr("class", function(d){return "linegroup " + d.key})
+        .attr("transform", function(d){return translate(0, 5*(lines.indexOf(d.key)))})
+
+  lineGroups.selectAll(".happening")
+    .data(function(d) {return d.values}).enter()
+    .append("rect")
+      .attr("class", "happening")
+      .attr("height", blocksize+1)
+      .attr("width",  blocksize+1)
+      .attr("fill", function(d){ return lineColors(d.LineName).brighter()})
+      .attr("stroke", function(d){ return lineColors(d.LineName).darker()})
+      .attr("y", -3) 
+      .attr("x", function(d){return x(format.parse(format(d.Date)))})
+
+}
+
+d3.json("./metro.json", init)
+  </script>
+
+</div>
+</body>
+</html>
