@@ -66,6 +66,15 @@ line.happening{
 .rushhour {
   fill: #ffeeee;
 }
+line.rushhour{
+  stroke: #eeaaaa;
+}
+text.rushhour{
+  fill: #ee0000;
+  font-size: 11px;
+  text-anchor: middle;
+}
+
 
 .datename, .monthname{
  dominant-baseline: middle;
@@ -88,31 +97,30 @@ line.happening{
   <script>
 
 
-  var init = function(data){
+  var draw = function(data){
 
   data = data.data.map(function(d){
       d.Date = new Date(d.Date);
       return d;
   });
 
-  var lines = ["hibiya", "ginza", "chiyoda", "touzai", "fukutoshin", "yurakucho", "hanzoumon", "nanboku", "marunouchi"];
+  var tokyoMetroLines = ["hibiya", "ginza", "chiyoda", "touzai", "fukutoshin", "yurakucho", "hanzoumon", "nanboku", "marunouchi"];
 
-  var lineColors = d3.scale.ordinal().domain(lines)
+  var lineColors = d3.scale.ordinal().domain(tokyoMetroLines)
     .range([
-      d3.rgb(109,109,109),
-      d3.rgb(248,152,29),
-      d3.rgb(0,163,93),
-      d3.rgb(0,178,233),
-      d3.rgb(153,77,43),
-      d3.rgb(248,228,61),
-      d3.rgb(136,37,139),
-      d3.rgb(72, 209, 204),
-      d3.rgb(254,0,0)
+      d3.rgb("#8ba2ae"),
+      d3.rgb("#f7931d"),
+      d3.rgb("#00a650"),
+      d3.rgb("#00b2dd"),
+      d3.rgb("#ba6831"),
+      d3.rgb("#ffdf00"),
+      d3.rgb("#937cb9"),
+      d3.rgb("#00b5ad"),
+      d3.rgb("#ed1c24")
     ]);
 
 
-  var format = d3.time.format("%H:%M:%S")
-
+  format = d3.time.format("%H:%M:%S")
   var translate = function(x,y){               
     return "translate(" + x + "," + y + ")";
   }
@@ -120,10 +128,12 @@ line.happening{
   var d3_time_suffixes = ["th", "st", "nd", "rd"];
 
   var d3_time_suffix = function(number) {
-    return d3_time_suffixes[(number > 10 && number < 14) || number % 10 > 3 ? 0 : number % 10];
+    return d3_time_suffixes[number > 10 && number < 14 || number % 10 > 3 ? 0 : number % 10];
   }
 
-  nested = d3.nest()
+  // Grid view
+
+  daily = d3.nest()
     .key(function(d){return d3.time.day.floor(d.Date)})
     .key(function(d){return d.LineName}).sortKeys(d3.ascending)
     .entries(data)
@@ -133,24 +143,23 @@ line.happening{
   var dayCount = d3.time.days.apply(this,extent).length;
 
   var blocksize      = 3;
-      dayHeight      = lines.length * blocksize,
-      width          = 900,
+      dayHeight      = tokyoMetroLines.length * blocksize,
+      width          = 24 * 38,
       topChartHeight = 300,
+      spacing        = 55,
       gridHeight     = (dayCount * dayHeight),
-      height         = topChartHeight + 50 + gridHeight,
-      margin         = {top: 20, right: 20, bottom: 40, left: 60};
+      height         = topChartHeight + spacing + gridHeight,
+      margin         = {top: 40, right: 20, bottom: 40, left: 60};
 
-  var x = d3.time.scale()
+  x = d3.time.scale()
     .rangeRound([0,width])
     .domain([
       format.parse("0:0:0"),
       +format.parse("0:0:0") + (24 * 60 * 60 * 1000)
     ]);
 
-  var topY = d3.time.scale()
-    .range([0 , topChartHeight]);
 
-  gridY = d3.time.scale()
+ var gridY = d3.time.scale()
     .rangeRound([gridHeight, 0])
     .domain(d3.extent(data, function(d){return d.Date}))
     .nice(d3.time.day)
@@ -164,18 +173,25 @@ line.happening{
   var xAxis = d3.svg.axis()
     .scale(x)
     .orient("bottom")
-    .tickFormat(d3.time.format("%I %p"))
+    .tickFormat(d3.time.format("%_I %p"))
     .tickSubdivide(2)
     .ticks(d3.time.hours, 3)
     .tickSize(8,4,2)
 
+
   svg.append("g").attr("class", "axis")
-     .attr("transform", translate(0, topChartHeight + 18))
+     .attr("transform", translate(0, topChartHeight + 5))
      .call(xAxis)
+
+  ticks = d3.selectAll(".tick text");
+
+  d3.select(ticks[0][ticks[0].length - 1]).remove()
+
+  ticks.attr("dx", 38/2)
 
   var grid = svg.append("g")
     .attr("class", "grid")
-    .attr("transform", translate(0, topChartHeight + 50))
+    .attr("transform", translate(0, topChartHeight + spacing))
 
   var days = grid.selectAll(".day")
     .data(gridY.ticks(d3.time.days)).enter()
@@ -186,8 +202,8 @@ line.happening{
   days.append("rect")
     .filter(function(d){return (d.getDay() != 0 && d.getDay() != 6)})
       .attr("class", "rushhour")
-      .attr("x", x(format.parse("8:0:0")))
-      .attr("width", x(format.parse("10:0:0")) - x(format.parse("8:0:0")))
+      .attr("x", x(format.parse("7:0:0")))
+      .attr("width", x(format.parse("10:0:0")) - x(format.parse("7:0:0")))
       .attr("height", dayHeight)
 
   days.append("rect")
@@ -236,7 +252,7 @@ line.happening{
     .attr("x2", width)
 
   var happeningDays = grid.selectAll(".happening-day")
-    .data(nested).enter()
+    .data(daily).enter()
       .append("g")
         .attr("class","happening-day")
         .attr("transform", function(d){return translate(0, gridY(new Date(d.key)))})
@@ -245,7 +261,7 @@ line.happening{
     .data(function(d) {return d.values}).enter()
       .append("g")
         .attr("class", function(d){return "linegroup " + d.key})
-        .attr("transform", function(d){return translate(0, 5*(lines.indexOf(d.key)))})
+        .attr("transform", function(d){return translate(0, 5*(tokyoMetroLines.indexOf(d.key)))})
 
   lineGroups.selectAll(".happening")
     .data(function(d) {return d.values}).enter()
@@ -253,14 +269,94 @@ line.happening{
       .attr("class", "happening")
       .attr("height", blocksize+1)
       .attr("width",  blocksize+1)
-      .attr("fill", function(d){ return lineColors(d.LineName).brighter()})
+      .attr("fill", function(d){ return lineColors(d.LineName)})
       .attr("stroke", function(d){ return lineColors(d.LineName).darker()})
       .attr("y", -3) 
       .attr("x", function(d){return x(format.parse(format(d.Date)))})
 
+  // Chart view
+  hourly = d3.nest()
+    .key(function(d){return d3.time.hour.floor(format.parse(format(d.Date)))})
+    .key(function(d){return d.LineName}).sortKeys(d3.ascending)
+    .rollup(function(d){ return d.length})
+    .entries(data)
+
+  var chartMax = d3.max(hourly.map(function(d){
+    return d3.sum(d.values, function(e){
+      return e.values
+    })
+  }));
+
+  var topY = d3.scale.linear()
+    .range([topChartHeight, 0])
+    .domain([0, chartMax])
+
+  hourly.forEach(function(d){
+    var offset = 0;
+    d.values.forEach(function(e){
+      offset = offset + e.values;
+      e.dy = offset;
+    });
+  });
+
+  var topChart = svg.append("g")
+
+  var rushHourLine = function(start, end){
+    topChart.append("line")
+      .attr("class", "rushhour")
+      .attr("x1", x(format.parse(start)))
+      .attr("x2", x(format.parse(end)))
+      .attr("y1",  -1 + topChartHeight + spacing / 2)
+      .attr("y2",  -1 + topChartHeight + spacing / 2)
+
+    topChart.append("line")
+      .attr("class", "rushhour")
+      .attr("x1", x(format.parse(start)))
+      .attr("x2", x(format.parse(start)))
+      .attr("y1",  8 + topChartHeight + spacing / 2)
+      .attr("y2", -12 + topChartHeight + spacing / 2)
+
+    topChart.append("line")
+      .attr("class", "rushhour")
+      .attr("x1", x(format.parse(end)))
+      .attr("x2", x(format.parse(end)))
+      .attr("y1",  8 + topChartHeight + spacing / 2)
+      .attr("y2", -12 + topChartHeight + spacing / 2)
+
+    topChart.append("text")
+      .attr("class", "rushhour")
+      .attr("x", x(format.parse(start)) + (x(format.parse(end)) - x(format.parse(start))) / 2)
+      .attr("y",  11 + topChartHeight + spacing / 2)
+      .text("Rush Hour")
+      .attr("fill", "#222")
+      .attr("stroke", null)
+      
+  }
+
+  rushHourLine("7:0:0", "10:0:0")
+  rushHourLine("17:0:0", "20:0:0")
+
+
+  var hourGroup = topChart.selectAll(".hourgroup")
+    .data(hourly).enter()
+    .append("g")
+    .attr("class", "hourgroup")
+    .attr("transform", function(d){ return translate(x(new Date(d.key)),0) })
+
+    hourGroup.selectAll("rect")
+    .data(function(d){return d.values}).enter()
+      .append("rect")
+        .attr("x",0) 
+        .attr("y", function(d){return topY(d.dy)})
+        .attr("width", x(format.parse("01:00:00")))
+        .attr("height", function(d){return topChartHeight - topY(d.values)})
+        .attr("class", function(d){return d.key})
+        .attr("fill", function(d){ return lineColors(d.key)})
+        .attr("stroke", function(d){ return lineColors(d.key).darker()})
+
 }
 
-d3.json("./metro.json", init)
+d3.json("./metro.json", draw)
   </script>
 
 </div>
