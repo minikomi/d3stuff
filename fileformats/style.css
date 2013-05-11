@@ -9,17 +9,16 @@ svg {
   shape-rendering: crispEdges;
 }
 
-
 .axis path,
 .axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
 }
-
-.tick {
+.axis text{
  font-size: 10px;
 }
+
 
 #tooltip {
   display: none;
@@ -51,4 +50,48 @@ svg {
   display: inline-block;
 }
 
+.fileDescription {
+  width: 640px;
+  margin-left: 10px;
+  text-align: justify;
+  float: left;
+}
 
+.fileKey {
+  margin: 0;
+  padding: 0;
+  float: right;
+  position: absolute;
+  top: 0px;
+  right: 0;
+  width: 330px;
+}
+
+.fileKey ul, li{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+}
+
+.fileKey li{
+  float:left; 
+  clear: left;
+  padding-top: 5px;
+}
+
+.blockDescription {
+  clear: left;
+  margin-top: 20px;
+}
+
+h2 {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 3px;
+  color: rgb(190, 41, 125);
+}
+
+h3 span{
+  color: #555;
+  font-size: 0.8em;
+}

@@ -1,0 +1,220 @@
+{"title": "IPv4 packet header",
+  "source": {"title": "RFC 791", "url": "https://tools.ietf.org/html/rfc791"},
+  "description": "The Internet Protocol is designed for use in interconnected systems of packet-switched computer communication networks. The internet protocol provides for transmitting blocks of data called datagrams from sources to destinations, where sources and destinations are hosts identified by fixed length addresses. The internet protocol also provides for fragmentation and reassembly of long datagrams, if necessary, for transmission through \"small packet\" networks.",
+  "bitblocks":  [
+    {"bits" : 4, "name" : "Version", "description" : "The Version field indicates the format of the internet header. ie. IPv4 or IPv6"},
+    {"bits" : 4, "name" : "Internet Header Length", "description" : "Length of the header in multiples of 4 bytes. Note that the minimum value for a correct header is 5."},
+    {"bits" : 8, "name" : "Type of Service", "description" : "Also referred to as Quality of Service (QoS). Describes what priority the packet should have"},
+    {"bits" : 16, "name" : "Length", "description" : "Total Length is the length of the datagram, measured in octets, including internet header and data. This field allows the length of a datagram to be up to 65,535 octets. Such long datagrams are impractical for most hosts and networks. All hosts must be prepared to accept datagrams of up to 576 octets (whether they arrive whole or in fragments)."},
+    {"bits" : 16, "name" : "Identification Tag", "description" : "An identifying value assigned by the sender to aid in assembling the fragments of a datagram."},
+    {"bits" : 1, "name" : "Zero Flag", "description" : "Must Be Zero."},
+    {"bits" : 1, "name" : "DF Flag", "description" : "<ul><li>0 = May Fragment</li><li>1 = Don't Fragment.</li></ul>"},
+    {"bits" : 1, "name" : "MF FLag", "description" : "<ul><li>0 = Last Fragment</li><li>1 = More Fragments.</li></ul>"},
+    {"bits" : 13, "name" : "Fragment Offset", "description" : "Identifies the position of the fragment within original packet. The fragment offset is measured in units of 8 octets (64 bits). The first fragment has offset zero."},
+    {"bits" : 8, "name" : "Time To Live (TTL)", "description" : "<p>This field indicates the maximum time the datagram is allowed to remain in the internet system. </p><p> If this field contains the value zero, then the datagram must be destroyed.</p><p> This field is modified in internet header processing. The time is measured in units of seconds, but since every module that processes a datagram must decrease the TTL by at least one even if it process the datagram in less than a second, the TTL must be thought of only as an upper bound on the time a datagram may exist. The intention is to cause undeliverable datagrams to be discarded, and to bound the maximum datagram lifetime.</p>"},
+    {"bits" : 8, "name" : "Protocol", "description" : "Protocol used (TCP, UDP, ICMP, etc.). Specified in \"Assigned Numbers\". See <a href='https://tools.ietf.org/html/rfc790'>RFC 790</a> for more information."},
+    {"bits" : 16, "name" : "Header Checksum", "description" : "A checksum on the header only. Since some header fields change (e.g., time to live), this is recomputed and verified at each point that the internet header is processed."},
+    {"bits" : 32, "name" : "Source IP Address", "description" : ""},
+    {"bits" : 32, "name" : "Destination IP Address", "description" : ""}
+  ]
+}
+
+   Source Port:  16 bits
+
+    The source port number.
+
+  Destination Port:  16 bits
+
+    The destination port number.
+
+
+  Sequence Number:  32 bits
+
+    The sequence number of the first data octet in this segment (except
+    when SYN is present). If SYN is present the sequence number is the
+    initial sequence number (ISN) and the first data octet is ISN+1.
+
+  Acknowledgment Number:  32 bits
+
+    If the ACK control bit is set this field contains the value of the
+    next sequence number the sender of the segment is expecting to
+    receive.  Once a connection is established this is always sent.
+
+  Data Offset:  4 bits
+
+    The number of 32 bit words in the TCP Header.  This indicates where
+    the data begins.  The TCP header (even one including options) is an
+    integral number of 32 bits long.
+
+  Reserved:  6 bits
+
+    Reserved for future use.  Must be zero.
+
+  Control Bits:  6 bits (from left to right):
+
+    URG:  Urgent Pointer field significant
+    ACK:  Acknowledgment field significant
+    PSH:  Push Function
+    RST:  Reset the connection
+    SYN:  Synchronize sequence numbers
+    FIN:  No more data from sender
+
+  Window:  16 bits
+
+    The number of data octets beginning with the one indicated in the
+    acknowledgment field which the sender of this segment is willing to
+    accept.
+
+  Checksum:  16 bits
+
+    The checksum field is the 16 bit one's complement of the one's
+    complement sum of all 16 bit words in the header and text.  If a
+    segment contains an odd number of header and text octets to be
+    checksummed, the last octet is padded on the right with zeros to
+    form a 16 bit word for checksum purposes.  The pad is not
+    transmitted as part of the segment.  While computing the checksum,
+    the checksum field itself is replaced with zeros.
+
+    The checksum also covers a 96 bit pseudo header conceptually
+
+
+[Page 16]                                                               
+
+
+September 1981                                                          
+                                           Transmission Control Protocol
+                                                Functional Specification
+
+
+
+    prefixed to the TCP header.  This pseudo header contains the Source
+    Address, the Destination Address, the Protocol, and TCP length.
+    This gives the TCP protection against misrouted segments.  This
+    information is carried in the Internet Protocol and is transferred
+    across the TCP/Network interface in the arguments or results of
+    calls by the TCP on the IP.
+
+                     +--------+--------+--------+--------+
+                     |           Source Address          |
+                     +--------+--------+--------+--------+
+                     |         Destination Address       |
+                     +--------+--------+--------+--------+
+                     |  zero  |  PTCL  |    TCP Length   |
+                     +--------+--------+--------+--------+
+
+      The TCP Length is the TCP header length plus the data length in
+      octets (this is not an explicitly transmitted quantity, but is
+      computed), and it does not count the 12 octets of the pseudo
+      header.
+
+  Urgent Pointer:  16 bits
+
+    This field communicates the current value of the urgent pointer as a
+    positive offset from the sequence number in this segment.  The
+    urgent pointer points to the sequence number of the octet following
+    the urgent data.  This field is only be interpreted in segments with
+    the URG control bit set.
+
+  Options:  variable
+
+    Options may occupy space at the end of the TCP header and are a
+    multiple of 8 bits in length.  All options are included in the
+    checksum.  An option may begin on any octet boundary.  There are two
+    cases for the format of an option:
+
+      Case 1:  A single octet of option-kind.
+
+      Case 2:  An octet of option-kind, an octet of option-length, and
+               the actual option-data octets.
+
+    The option-length counts the two octets of option-kind and
+    option-length as well as the option-data octets.
+
+    Note that the list of options may be shorter than the data offset
+    field might imply.  The content of the header beyond the
+    End-of-Option option must be header padding (i.e., zero).
+
+    A TCP must implement all options.
+
+
+                                                               [Page 17]
+
+
+                                                          September 1981
+Transmission Control Protocol
+Functional Specification
+
+
+
+    Currently defined options include (kind indicated in octal):
+
+      Kind     Length    Meaning
+      ----     ------    -------
+       0         -       End of option list.
+       1         -       No-Operation.
+       2         4       Maximum Segment Size.
+      
+
+    Specific Option Definitions
+
+      End of Option List
+
+        +--------+
+        |00000000|
+        +--------+
+         Kind=0
+
+        This option code indicates the end of the option list.  This
+        might not coincide with the end of the TCP header according to
+        the Data Offset field.  This is used at the end of all options,
+        not the end of each option, and need only be used if the end of
+        the options would not otherwise coincide with the end of the TCP
+        header.
+
+      No-Operation
+
+        +--------+
+        |00000001|
+        +--------+
+         Kind=1
+
+        This option code may be used between options, for example, to
+        align the beginning of a subsequent option on a word boundary.
+        There is no guarantee that senders will use this option, so
+        receivers must be prepared to process options even if they do
+        not begin on a word boundary.
+
+      Maximum Segment Size
+
+        +--------+--------+---------+--------+
+        |00000010|00000100|   max seg size   |
+        +--------+--------+---------+--------+
+         Kind=2   Length=4
+
+
+
+
+
+
+[Page 18]                                                               
+
+
+September 1981                                                          
+                                           Transmission Control Protocol
+                                                Functional Specification
+
+
+
+        Maximum Segment Size Option Data:  16 bits
+
+          If this option is present, then it communicates the maximum
+          receive segment size at the TCP which sends this segment.
+          This field must only be sent in the initial connection request
+          (i.e., in segments with the SYN control bit set).  If this
+          option is not used, any segment size is allowed.
+
+  Padding:  variable
+
+    The TCP header padding is used to ensure that the TCP header ends
+    and data begins on a 32 bit boundary.  The padding is composed of
+    zeros.

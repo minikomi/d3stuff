@@ -2,20 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Tokyo Metro</title>
+<title>File Formats</title>
 <link href="./style.css" rel="stylesheet" />
 </head>
 
 <body>
-  <h1>Tokyo Metro Happenings</h3>
-  <p>
-  A chart showing the last ~30 days worth happenings on the tokyo subway lines, and totaling them depending on the time of day.
-  </p>
-  <p>Data was scraped from the Tokyo Metro site. Mouse over an event for more information in Japanese.</p>
 <div id="main">
+  <script type="text/html" id="file_description_tmpl">
+    <div class="fileDescription">
+      <h2><%= title %></h2>
+      <h3>Source: <a href="<%= source.url %>"><%= source.title %></a></h3>
+      <div class="description">
+      <%= description %>
+    </div>
+  </script>
   <script src="d3.v3.min.js"></script>
+  <script src="micro-template.js"></script>
   <script src="chart.js"></script>
   <div id="tooltip"></div>
+
 </div>
 </body>
 </html>
