@@ -1,0 +1,54 @@
+body {
+  font-family: sans-serif;
+  position: relative;
+  width: 1000px;
+  margin: 10px auto;
+}
+
+svg {
+  shape-rendering: crispEdges;
+}
+
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.tick {
+ font-size: 10px;
+}
+
+#tooltip {
+  display: none;
+  position: absolute;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 2px #aaa;
+  width: 400px;
+  background: #fff;
+  padding: 6px;
+  font-size: 12px;
+}
+
+#tooltip p{
+  margin: 0;
+  padding: 0;
+}
+
+#tooltip h3 {
+  line-height: 25px;
+  margin: 0 0 4px 0;
+  padding: 0 0 4px 0;
+  border-bottom: 1px solid #aaa;
+}
+
+#tooltip h3 img{
+  margin-top: 4px;
+  margin-bottom: -6px;
+  margin-right: 4px;
+  display: inline-block;
+}
+
+

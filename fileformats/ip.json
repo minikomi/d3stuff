@@ -1,0 +1,14 @@
+[
+  {bits : 4  , name : "Version"                , description : "Specifies if it's an IPv4 or IPv6 packet"},
+  {bits : 4  , name : "Internet Header Length" , description : "Length of the header in multiples of 4 bytes (e.g., 5 means 20 bytes)"},
+  {bits : 8  , name : "Type of Service"        , description : "Also referred to as Quality of Service (QoS). Describes what priority the packet should have"},
+  {bits : 16 , name : "Length"                 , description : "Length of the packet in bytes"},
+  {bits : 16 , name : "Identification Tag"     , description : "To help reconstruct the packet from several fragments"},
+  {bits : 3  , name : "Flags"                  , description : "The first contains a zero, followed by a flag that says whether the packet is allowed to be fragmented or not (DF: Don't fragment), and a flag to state whether more fragments of a packet follow (MF: More Fragments)"},
+  {bits : 13 , name : "Fragment Offset"        , description : "A field to identify position of fragment within original packet"},
+  {bits : 8  , name : "Time To Live (TTL)"     , description : "The number of hops (router, computer or device along a network) the packet is allowed to pass before it dies (for example, a packet with a TTL of 16 will be allowed to go across 16 routers to get to its destination before it is discarded)"},
+  {bits : 8  , name : "Protocol"               , description : "Protocol used (TCP, UDP, ICMP, etc.)"},
+  {bits : 16 , name : "Header Checksum"        , description : "A number used in error detection"},
+  {bits : 32 , name : "Source"                 , description : "Source IP Address"},
+  {bits : 32 , name : "Destination"            , description : "Destination IP Address"}
+]
