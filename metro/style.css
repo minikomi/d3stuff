@@ -1,0 +1,120 @@
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.happening {
+ stroke-width: 1px;
+}
+
+body {
+  font-family: sans-serif;
+  position: relative;
+  width: 1000px;
+  margin: 10px auto;
+}
+.tick {
+ font-size: 10px;
+}
+
+#main {
+  margin: 0 0 0 -40px;
+}
+
+svg{
+  shape-rendering: crispEdges;
+}
+
+.day line, .gridbase{
+  stroke: #555;
+  stroke-width: 1;
+}
+
+.day text {
+  text-anchor: end;
+  font-size: 10px;
+  font-family: sans-serif;
+  fill: #222;
+}
+
+.day text.weekend {
+  fill: #66f;
+}
+
+line.hour {
+  stroke: #ccc;
+}
+line.hour.min {
+  stroke-dasharray: 2 4;
+}
+line.hour.main {
+  stroke: #999;
+}
+
+line.happening{
+  stroke-width: 1px;
+}
+
+.rushhour {
+  fill: #ffeeee;
+}
+line.rushhour{
+  stroke: #e77;
+}
+text.rushhour{
+  fill: #ee0000;
+  font-size: 11px;
+  text-anchor: middle;
+}
+
+
+.datename, .monthname{
+ dominant-baseline: middle;
+}
+.day text.datename{
+  fill: #222;
+}
+.day text.monthname{
+ fill: #e00;
+ text-anchor: start;
+}
+
+text.labeltext{
+  fill: white;
+  text-anchor: middle;
+  font-size: 11px;
+}
+
+#tooltip {
+  display: none;
+  position: absolute;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 2px #aaa;
+  width: 400px;
+  background: #fff;
+  padding: 6px;
+  font-size: 12px;
+}
+
+#tooltip p{
+  margin: 0;
+  padding: 0;
+}
+
+#tooltip h3 {
+  line-height: 25px;
+  margin: 0 0 4px 0;
+  padding: 0 0 4px 0;
+  border-bottom: 1px solid #aaa;
+}
+
+#tooltip h3 img{
+  margin-top: 4px;
+  margin-bottom: -6px;
+  margin-right: 4px;
+  display: inline-block;
+}
+
+
