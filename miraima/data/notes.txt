@@ -1,0 +1,3 @@
+url: http://www.e-stat.go.jp/SG1/estat/GL38020103.do?_toGL38020103_&listID=000001112829&requestSender=estat
+Number of In-migrants from Other Prefectures by Age (5-Year Age Group) and Sex for Japan and Prefectures
+Number of Out-migrants to Other Prefectures by Age (5-Year Age Group) and Sex for Japan and Prefectures

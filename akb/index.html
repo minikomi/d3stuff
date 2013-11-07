@@ -7,6 +7,9 @@
     body {
       padding-right: 30px;
     }
+    * {
+      shape-rendering="crispEdges";
+    }
     #main {
       position: relative;
 
@@ -17,7 +20,7 @@
       stroke: #111;
       stroke-dasharray: 1 5;
     }
-    
+
     .percent text{
       font-family: sans-serif;
       font-size: 10px;
@@ -46,14 +49,15 @@
     }
 
     path.idol{
-      stroke-width: 1px;
-      stroke: #aaa;
+      stroke-width: 0.5px;
+      stroke: #555;
+      fill: #eee;
     }
 
     rect{
       opacity: 0.75;
     }
- 
+
     text.idol{
       font-family: sans-serif;
       font-size: 10px;
@@ -67,7 +71,7 @@
     .idol.visible{
       opacity: 1.0;
     }
- 
+
     .deadvotes {
       fill: #ccc;
     }
@@ -84,22 +88,22 @@
      fill: #34B6E4;
     }
     .team-4, text.team-4 {
-      background-color: Yellow; 
-      fill: Yellow; 
+      background-color: #F1E018;
+      fill: #F1E018;
     }
-    .team-E, text.team-E { 
-      background-color: #44aa22; 
-      fill: #44aa22; 
+    .team-E, text.team-E {
+      background-color: #CCCCCC;
+      fill: #CCCCCC;
     }
-    .team-H, text.team-H { 
+    .team-H, text.team-H {
       background-color: #009140;
       fill: #009140;
     }
-    .team-KII, text.team-KII { 
+    .team-KII, text.team-KII {
       background-color: Teal;
       fill: Teal;
     }
-    .team-N, text.team-N { 
+    .team-N, text.team-N {
       background-color: #333333;
       color: #333333;
     }
@@ -107,13 +111,13 @@
       background-color: Orange;
       fill: Orange;
     }
-    .team-SK, text.team-SK { 
+    .team-SK, text.team-SK {
       background-color: #aea9a2;
       fill: #aea9a2;
     }
-    .team-kenkyuuse, text.team-kenkyuusei{ 
-     background-color: Red; 
-     fill: Red; 
+    .team-kenkyuuse, text.team-kenkyuusei{
+     background-color: Red;
+     fill: Red;
     }
     .singleinfo {
       text-anchor: middle;
@@ -200,6 +204,7 @@ var singlesinfo = [
   , {title: "17thシングル選抜総選挙",subtitle: "「母さんに誓って、ガチです」"}
   , {title:"22ndシングル選抜総選挙", subtitle: "「今年もガチです」"}
   , {title:"27thシングル選抜総選挙", subtitle: "〜ファンが選ぶ64議席〜"}
+  , {title:"32ndシングル選抜総選挙", subtitle: "〜夢は一人じゃ見られない〜"}
   ];
 
 var images = {
@@ -275,15 +280,36 @@ var images = {
   "高城亜樹":"takajo_aki_list.jpg",
   "前田敦子":"maeda_atsuko.jpg",
   "山本彩":"sakaya_yamamoto.jpg",
-  "中田ちさと": "nakata_chisato_list.jpg"
+  "中田ちさと": "nakata_chisato_list.jpg",
+  "柴田阿弥": "shibata_aya.jpg",
+  "川栄李奈": "kawaei_rina.jpg",
+  "入山杏奈": "iriyama_anna.jpg",
+  "兒玉遥":   "kodama_haruka.jpg",
+  "梅本まどか": "umemoto_madoka.jpg",
+  "上西恵": "jyonishi_kei.jpg",
+  "松本梨奈": "matsumoto_rina.jpg"
+//  "小林亜実"
+//  "矢倉楓子"
+//  "金子栞 
+// "金子栞 
+//  "朝長美桜 
+// "磯原杏華 
+//  "田島芽瑠 
+// "吉田朱里 
+//  "薮下柊 
+//  "小林亜実 
+//  "矢倉楓子 
+// " 斉藤真木子 
+
 }
 
 
 var margin = {top: 20, right: 20, bottom: 80, left: 40},
     width = 1000 - margin.left - margin.right,
-    height = 660 - margin.top - margin.bottom;
+    height = 1000 - margin.top - margin.bottom;
 
-var translate = function(x,y){               
+
+var translate = function(x,y){
   return "translate(" + x + "," + y + ")";
 }
 
@@ -295,7 +321,7 @@ var svg = d3.select("#main").append("svg")
     .attr("transform", translate(margin.left, margin.top + 0.5))
 
 d3.values(images)
-  .forEach(function(i){ 
+  .forEach(function(i){
     svg.append("image")
       .attr("height",0)
       .attr("w",0)
@@ -319,19 +345,27 @@ d3.csv("akb.csv", function(csvData){
     return single.values.reduce(function(sum, d){return d.values.votes + sum}, 0)
   }
 
+  var totals = singlesdata.map(function(d){ return sumVotes(d) })
+
+  var max = d3.max(totals)
+
   var y = d3.scale.linear()
           .range([0, height])
-          .domain([0,100]);
+          .domain([0,max]);
 
   var x = d3.scale.linear()
           .range([0,infobarwidth])
           .domain([0,100]);
 
+  var axisvals = d3.range(0,max,100000);
+
+  axisvals.push(max)
+
   var percents = svg.selectAll(".percent")
-      .data(d3.range(0,101,10))
+      .data(axisvals)
     .enter().append("g")
       .attr("class","percent")
-      .attr("transform", function(d){return translate(0, y(d)-0.5)})
+      .attr("transform", function(d){return translate(0, height - y(d)-0.5)})
 
   percents.append("line")
     .attr("y1", 0)
@@ -342,18 +376,17 @@ d3.csv("akb.csv", function(csvData){
   percents.append("text")
       .attr("y", 12)
       .attr("x", chartwidth + 40)
-      .text(function(d){return d + "%"});
+      .text(function(d){return d.toLocaleString() + "票"});
 
   singlesdata.map(function(d){
     var dx = 0;
     d.values.map(function(datum){
-      datum.values.dx = dx; 
-      dx += datum.values.votes; 
+      datum.values.dx = dx;
+      dx += datum.values.votes;
       return d
     })
   });
 
-  var totals = singlesdata.map(function(d){ return sumVotes(d) })
 
   var singles = svg.selectAll(".single")
         .data(singlesdata,function(d,i) { return d.key; })
@@ -375,10 +408,10 @@ d3.csv("akb.csv", function(csvData){
       .data(function(d){ return d.values })
 
   idols.enter().append("rect")
-      .attr("height", function(d,i){ return y((d.values.votes/totals[d.values.single-1]) * 100) - 1})
+      .attr("height", function(d,i){ return y(d.values.votes)})
       .attr("width", barwidth)
       .attr("x", 0)
-      .attr("y", function(d) { return y((d.values.dx /totals[d.values.single-1]) * 100) + 1})
+      .attr("y", function(d) { return height - y(totals[d.values.single-1]) + y(d.values.dx)})
       .attr("class", function(d){ return "idol team-"+d.values.team})
       .attr("data-idol", function(d) {return d.values.name})
       .on("mouseover", function(d){
@@ -419,6 +452,9 @@ d3.csv("akb.csv", function(csvData){
                .attr("y", 33)
                .attr("x", (infobarwidth / 2) - 62.5)
                .attr("xlink:href", "image/"+images[d.values.name])
+               if(typeof images[d.values.name]  === "undefined"){
+                 console.log(d.values.name)
+               }
 
         var history = infobox.selectAll(".history")
           .data(singlesdata.reduce(function(v, sd){
@@ -427,7 +463,7 @@ d3.csv("akb.csv", function(csvData){
               v.push(idol[0])
             }
             return v;
-          }, []))   
+          }, []).reverse())
 
         bars = history.enter()
                .append("g")
@@ -443,7 +479,7 @@ d3.csv("akb.csv", function(csvData){
               .attr("class", function(d){ return "team-"+d.values.team})
                .text(function(d){return "Team " + d.values.team})
                .attr("y", function(d,i){return i * 60;})
-               .attr("x", 163)                   
+               .attr("x", 163)
 
         bars.append("text")
                .attr("class", "subtitle")
@@ -471,9 +507,9 @@ d3.csv("akb.csv", function(csvData){
                .attr("width", function(d){return x((totals[d.values.single-1] - d.values.votes) / totals[d.values.single-1] * 100)})
                .attr("class", function(d){ return "deadvotes"})
                .attr("height", 12)
-        
+
         bars.append("text")
-          .text(function(d){return d.key;})
+          .text(function(d){return d.key + "位";})
           .attr("y", function(d,i){return (i * 60) + 31;})
           .attr("x", infobarwidth + 2)
           .attr("style", "fill: #444; font-height: 10px;")
@@ -493,13 +529,13 @@ d3.csv("akb.csv", function(csvData){
   idols.enter().append("text")
       .attr("class", "idol")
       .attr("x", barwidth + 2)
-      .attr("y", function(d) { return y(((d.values.dx + (d.values.votes/2)) /totals[d.values.single-1]) * 100) + 14})
-      .text( function(d){return d.values.rank})
+      .attr("y", function(d) { return (height - y(totals[d.values.single - 1])) + y(d.values.dx + d.values.votes) + 14})
+      .text( function(d){return d.values.rank + "位"})
 
 
   idols.enter().append("svg:path")
     .attr("data-idol", function(d) {return d.values.name})
-    .attr("class", "idol")
+    .attr("class", function(d){return "idol team-" + d.values.team})
     .filter(function(d) {
       if (singlesdata[d.values.single] === undefined) {
         return false;
@@ -508,8 +544,33 @@ d3.csv("akb.csv", function(csvData){
     })
     .attr("d", function(d){
       var d1 = singlesdata[d.values.single].values.filter( function(e){ return e.values.name == d.values.name})[0];
-      return "M " + (barwidth + 5)  + " " + y((d.values.dx  + d.values.votes/2)/totals[d.values.single-1] * 100) + 
-             "L " + (spacing - 6)   + " " + y((d1.values.dx + d1.values.votes/2)/totals[d.values.single] * 100)
+
+      var curvature = .44;
+
+      var x0 = barwidth,
+          x1 = spacing,
+          xi = d3.interpolateNumber(x0, x1),
+          x2 = xi(curvature),
+          x3 = xi(1 - curvature),
+
+          y0 = (height - y(totals[d.values.single -1])) + y(d.values.dx),
+          y0v = (height - y(totals[d.values.single -1])) + y(d.values.dx+d.values.votes),
+          y1 = ((height - y(totals[d1.values.single -1])) + y(d1.values.dx));
+          y1v = ((height - y(totals[d1.values.single -1])) + y(d1.values.dx + d1.values.votes));
+
+          return "M" + x0  + "," + y0v
+
+                 + "C" + x3  + "," + y0v
+                 + " " + x2  + "," + y1v
+                 + " " + x1  + "," + y1v
+
+           + "L " + x1  + "," + y1
+
+                 + "C" + x2  + "," + y1
+                 + " " + x3  + "," + y0
+                 + " " + x0  + "," + y0
+
+           + "L " + x0  + "," + y0v
     })
 });
 </script>
@@ -536,11 +597,11 @@ d3.csv("akb.csv", function(csvData){
       <li><div class="team-SK"></div> - Team K</li>
       <li><div class="team-kenkyuuse"></div> - Kenkyuusei</li>
   </ul>
-  
+
   <h2>データーのソーズ</h2>
   <ul>
     <li><a href="http://ja.wikipedia.org/wiki/AKB48_13th%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E9%81%B8%E6%8A%9C%E7%B7%8F%E9%81%B8%E6%8C%99%E3%80%8C%E7%A5%9E%E6%A7%98%E3%81%AB%E8%AA%93%E3%81%A3%E3%81%A6%E3%82%AC%E3%83%81%E3%81%A7%E3%81%99%E3%80%8D">AKB48 13thシングル選抜総選挙</a>
-    <br/>                                                                                                      
+    <br/>
         <span class="small">第1回・2009年・赤坂BLITZ</span></li>
     <li>
     <a href="http://ja.wikipedia.org/wiki/AKB48_17th%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E9%81%B8%E6%8A%9C%E7%B7%8F%E9%81%B8%E6%8C%99%E3%80%8C%E6%AF%8D%E3%81%95%E3%82%93%E3%81%AB%E8%AA%93%E3%81%A3%E3%81%A6%E3%80%81%E3%82%AC%E3%83%81%E3%81%A7%E3%81%99%E3%80%8D">AKB48 17thシングル選抜総選挙</a>
@@ -550,10 +611,13 @@ d3.csv("akb.csv", function(csvData){
       <li><a href="http://ja.wikipedia.org/wiki/AKB48_27th%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E9%81%B8%E6%8A%9C%E7%B7%8F%E9%81%B8%E6%8C%99">AKB48 27thシングル選抜総選挙</a>
       <br/>
       <span class="small">第4回・2012年・日本武道館</span></li>
+      <li><a href="http://ja.wikipedia.org/wiki/AKB48_32nd%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%AB%E9%81%B8%E6%8A%9C%E7%B7%8F%E9%81%B8%E6%8C%99">AKB48 32ndシングル選抜総選挙</a>
+      <br/>
+      <span class="small">第5回・2013年</span></li>
   </ul>
 
 </div>
 </div>
-    
+
 </body>
 </html>

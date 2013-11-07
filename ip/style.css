@@ -1,0 +1,97 @@
+body {
+  font-family: sans-serif;
+  position: relative;
+  width: 1000px;
+  margin: 10px auto;
+}
+
+svg {
+  shape-rendering: crispEdges;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.axis text{
+ font-size: 10px;
+}
+
+
+#tooltip {
+  display: none;
+  position: absolute;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 2px #aaa;
+  width: 400px;
+  background: #fff;
+  padding: 6px;
+  font-size: 12px;
+}
+
+#tooltip p{
+  margin: 0;
+  padding: 0;
+}
+
+#tooltip h3 {
+  line-height: 25px;
+  margin: 0 0 4px 0;
+  padding: 0 0 4px 0;
+  border-bottom: 1px solid #aaa;
+}
+
+#tooltip h3 img{
+  margin-top: 4px;
+  margin-bottom: -6px;
+  margin-right: 4px;
+  display: inline-block;
+}
+
+.fileDescription {
+  width: 640px;
+  margin-left: 10px;
+  text-align: justify;
+  float: left;
+}
+
+.fileKey {
+  margin: 0;
+  padding: 0;
+  float: right;
+  position: absolute;
+  top: 0px;
+  right: 0;
+  width: 330px;
+}
+
+.fileKey ul, li{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+}
+
+.fileKey li{
+  float:left; 
+  clear: left;
+  padding-top: 5px;
+}
+
+.blockDescription {
+  clear: left;
+  margin-top: 20px;
+}
+
+h2 {
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 3px;
+  color: rgb(190, 41, 125);
+}
+
+h3 span{
+  color: #555;
+  font-size: 0.8em;
+}
